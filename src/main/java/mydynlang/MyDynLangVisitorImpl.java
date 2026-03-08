@@ -1,26 +1,38 @@
 package mydynlang;
 
-import com.mydynlang.MyDynLangBaseVisitor;
-import com.mydynlang.MyDynLangParser;
-
-import org.objectweb.asm.*;
 import static org.objectweb.asm.Opcodes.*;
 
-import java.nio.file.Path;
+import com.mydynlang.MyDynLangBaseVisitor;
+import com.mydynlang.MyDynLangParser;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.lang.invoke.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import org.objectweb.asm.*;
 
 public class MyDynLangVisitorImpl extends MyDynLangBaseVisitor<Void> {
-    
+
     ClassWriter cw;
     MethodVisitor mv;
-    
+
     MyDynLangVisitorImpl() {
         super();
         cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        cw.visit(V21, ACC_PUBLIC, "MyLangProgram", null, "java/lang/Object", null);
-        mv = cw.visitMethod(ACC_PUBLIC|ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
+        cw.visit(
+            V21,
+            ACC_PUBLIC,
+            "MyLangProgram",
+            null,
+            "java/lang/Object",
+            null
+        );
+        mv = cw.visitMethod(
+            ACC_PUBLIC | ACC_STATIC,
+            "main",
+            "([Ljava/lang/String;)V",
+            null,
+            null
+        );
     }
 
     @Override
@@ -34,12 +46,13 @@ public class MyDynLangVisitorImpl extends MyDynLangBaseVisitor<Void> {
     @Override
     public Void visitExpression(MyDynLangParser.ExpressionContext ctx) {
         // Get System.out onto the stack so that we can print the result
-        mv.visitFieldInsn(GETSTATIC,
+        mv.visitFieldInsn(
+            GETSTATIC,
             "java/lang/System",
             "out",
             "Ljava/io/PrintStream;"
         );
-        
+
         visit(ctx.left);
         visit(ctx.right);
         // Call Indy
@@ -50,21 +63,22 @@ public class MyDynLangVisitorImpl extends MyDynLangBaseVisitor<Void> {
             "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;",
             false // Not an interface
         );
-        
+
         mv.visitInvokeDynamicInsn(
-            "add",   // Operation name (Currently unused as we only have add as the operation)
+            "add", // Operation name (Currently unused as we only have add as the operation)
             "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;", // Callsite description
             bootstrapHandle
         );
-        
+
         // Call println
-        mv.visitMethodInsn(INVOKEVIRTUAL,
+        mv.visitMethodInsn(
+            INVOKEVIRTUAL,
             "java/io/PrintStream",
             "println",
             "(Ljava/lang/Object;)V",
             false
         );
-        
+
         mv.visitInsn(RETURN);
         mv.visitMaxs(0, 0);
         mv.visitEnd();
@@ -79,12 +93,12 @@ public class MyDynLangVisitorImpl extends MyDynLangBaseVisitor<Void> {
         mv.visitLdcInsn(text);
         return null;
     }
-    
+
     public void dumpBytecodeFile(Path path) {
         byte[] bytecode = cw.toByteArray();
         try {
             Files.write(path, bytecode);
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             System.out.println("Exception thrown: " + ioe);
         }
     }

@@ -9,7 +9,8 @@ import java.nio.file.Path;
 public class App {
     public static void main(String[] args) throws Exception {
         // The expression to evaluate
-        String source = "\"1\" + \"3\"";
+        String source = args[0];
+        System.out.println("Received source: " + source);
 
         // 1. Lex the input
         CharStream input = CharStreams.fromString(source);

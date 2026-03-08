@@ -4,10 +4,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>mydynlang</groupId>
-  <artifactId>.</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <artifactId>MyDynLang</artifactId>
+  <version>1.0</version>
 
-  <name>.</name>
+  <name>MyDynLang</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
@@ -118,6 +118,24 @@
           <configuration>
               <visitor>true</visitor>
           </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.6.0</version>
+          <executions>
+              <execution>
+                  <phase>package</phase>
+                  <goals><goal>shade</goal></goals>
+                  <configuration>
+                      <transformers>
+                          <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                              <mainClass>mydynlang.App</mainClass>
+                          </transformer>
+                      </transformers>
+                  </configuration>
+              </execution>
+          </executions>
       </plugin>
     </plugins>
   </build>

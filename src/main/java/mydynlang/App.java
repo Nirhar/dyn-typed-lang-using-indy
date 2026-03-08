@@ -24,10 +24,7 @@ public class App {
         MyDynLangVisitorImpl visitor = new MyDynLangVisitorImpl();
         visitor.visit(tree);
         
-        // 4. Dump the class file for debugging
+        // 4. Dump the class file for debugging and execution
         visitor.dumpBytecodeFile(Path.of("MyLangProgram.class"));
-
-        // // 4. Print the result
-        // System.out.println(result);
     }
 }

@@ -9,6 +9,7 @@ import static org.objectweb.asm.Opcodes.*;
 import java.nio.file.Path;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.lang.invoke.*;
 
 public class MyDynLangVisitorImpl extends MyDynLangBaseVisitor<Void> {
     
@@ -41,11 +42,20 @@ public class MyDynLangVisitorImpl extends MyDynLangBaseVisitor<Void> {
         
         visit(ctx.left);
         visit(ctx.right);
-        // TODO: Insert Invokedynamic instruction here
-        // Temporarily pop 2 values push some string onto the stack
-        mv.visitInsn(POP);
-        mv.visitInsn(POP);
-        mv.visitLdcInsn("42");
+        // Call Indy
+        Handle bootstrapHandle = new Handle(
+            H_INVOKESTATIC, // Bootstrap is usually a static method
+            "mydynlang/MyDynLangAdd",
+            "bootstrap",
+            "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;",
+            false // Not an interface
+        );
+        
+        mv.visitInvokeDynamicInsn(
+            "add",   // Operation name (Currently unused as we only have add as the operation)
+            "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;", // Callsite description
+            bootstrapHandle
+        );
         
         // Call println
         mv.visitMethodInsn(INVOKEVIRTUAL,

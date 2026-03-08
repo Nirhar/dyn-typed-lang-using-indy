@@ -4,11 +4,12 @@ import com.mydynlang.MyDynLangLexer;
 import com.mydynlang.MyDynLangParser;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
+import java.nio.file.Path;
 
 public class App {
     public static void main(String[] args) throws Exception {
         // The expression to evaluate
-        String source = "1 + 3";
+        String source = "\"1\" + \"3\"";
 
         // 1. Lex the input
         CharStream input = CharStreams.fromString(source);
@@ -19,11 +20,14 @@ public class App {
         MyDynLangParser parser = new MyDynLangParser(tokens);
         MyDynLangParser.ProgramContext tree = parser.program();
 
-        // 3. Evaluate by walking the parse tree
+        // 3. Generate class file by walking the parse tree
         MyDynLangVisitorImpl visitor = new MyDynLangVisitorImpl();
-        Object result = visitor.visit(tree);
+        visitor.visit(tree);
+        
+        // 4. Dump the class file for debugging
+        visitor.dumpBytecodeFile(Path.of("MyLangProgram.class"));
 
-        // 4. Print the result
-        System.out.println(result);
+        // // 4. Print the result
+        // System.out.println(result);
     }
 }

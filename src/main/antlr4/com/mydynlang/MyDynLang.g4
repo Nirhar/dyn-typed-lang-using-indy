@@ -14,16 +14,11 @@ expression
     ;
 
 atom
-    : INTEGER
-    | STRING
+    : STRING
     ;
 
 // ─── Lexer Rules ────────────────────────────────────────────────────
 // (uppercase = lexer rules)
-
-INTEGER
-    : [0-9]+
-    ;
 
 STRING
     : '"' (~["\r\n])* '"'

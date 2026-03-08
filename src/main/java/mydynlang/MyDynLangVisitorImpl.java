@@ -32,9 +32,29 @@ public class MyDynLangVisitorImpl extends MyDynLangBaseVisitor<Void> {
 
     @Override
     public Void visitExpression(MyDynLangParser.ExpressionContext ctx) {
+        // Get System.out onto the stack so that we can print the result
+        mv.visitFieldInsn(GETSTATIC,
+            "java/lang/System",
+            "out",
+            "Ljava/io/PrintStream;"
+        );
+        
         visit(ctx.left);
         visit(ctx.right);
         // TODO: Insert Invokedynamic instruction here
+        // Temporarily pop 2 values push some string onto the stack
+        mv.visitInsn(POP);
+        mv.visitInsn(POP);
+        mv.visitLdcInsn("42");
+        
+        // Call println
+        mv.visitMethodInsn(INVOKEVIRTUAL,
+            "java/io/PrintStream",
+            "println",
+            "(Ljava/lang/Object;)V",
+            false
+        );
+        
         mv.visitInsn(RETURN);
         mv.visitMaxs(0, 0);
         mv.visitEnd();
